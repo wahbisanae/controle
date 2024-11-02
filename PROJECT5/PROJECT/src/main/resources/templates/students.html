@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Étudiants</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+        /* Navbar Styling */
+        .navbar {
+            background: linear-gradient(90deg, #4e54c8, #8f94fb);
+            color: white;
+        }
+        .navbar-brand, .nav-link {
+            color: white !important;
+            font-weight: bold;
+        }
+        .nav-link:hover {
+            color: #e0e0e0 !important;
+        }
+
+        /* Hero Section Styling */
+        .hero-section {
+            background: #f0f4f8;
+            padding: 30px 20px;
+            text-align: center;
+            color: #333;
+        }
+        .hero-section h1 {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #4e54c8;
+        }
+
+        /* Form and Table Styling */
+        .form-container, .table-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .form-control {
+            border-radius: 5px;
+        }
+
+        /* Button Styling */
+        .btn-mauve {
+            background-color: #6c63ff;
+            color: white;
+            border: none;
+            transition: background-color 0.3s ease;
+        }
+        .btn-mauve:hover {
+            background-color: #4e54c8;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg">
+    <div class="navbar-collapse">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/}">Étudiants</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/exams}">Examens</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/results}">Résultats</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<div class="hero-section">
+    <h1>Gestion des Étudiants</h1>
+</div>
+
+<!-- Form Section -->
+<div class="container form-container">
+    <h2>Ajouter un Nouvel Étudiant</h2>
+    <form th:action="@{/students}" th:object="${newStudent}" method="post">
+        <div class="form-group">
+            <input type="text" th:field="*{firstName}" class="form-control" placeholder="Prénom" required />
+        </div>
+        <div class="form-group">
+            <input type="text" th:field="*{lastName}" class="form-control" placeholder="Nom" required />
+        </div>
+        <div class="form-group">
+            <input type="email" th:field="*{email}" class="form-control" placeholder="Email" required />
+        </div>
+        <button type="submit" class="btn btn-mauve btn-block">Ajouter Étudiant</button>
+    </form>
+</div>
+
+<!-- Students Table Section -->
+<div class="container table-container">
+    <h2>Liste des Étudiants</h2>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th scope="col">Nom</th>
+            <th scope="col">Prénom</th>
+            <th scope="col">Email</th>
+            <th scope="col">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="student : ${students}">
+            <td th:text="${student.lastName}">Nom de l'étudiant</td>
+            <td th:text="${student.firstName}">Prénom de l'étudiant</td>
+            <td th:text="${student.email}">Email de l'étudiant</td>
+            <td>
+                <a th:href="@{/students/edit/{id}(id=${student.id})}" class="btn btn-mauve btn-sm">Modifier</a>
+                <form th:action="@{/students/{id}(id=${student.id})}" method="post" th:method="delete" class="d-inline">
+                    <button type="submit" class="btn btn-mauve btn-sm">Supprimer</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>

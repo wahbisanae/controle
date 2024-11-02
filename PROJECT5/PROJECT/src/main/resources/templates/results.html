@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Résultats</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+        /* Navbar Styling */
+        .navbar {
+            background: linear-gradient(90deg, #4e54c8, #8f94fb);
+            color: white;
+        }
+        .navbar-brand, .nav-link {
+            color: white !important;
+            font-weight: bold;
+        }
+        .nav-link:hover {
+            color: #e0e0e0 !important;
+        }
+
+        /* Hero Section Styling */
+        .hero-section {
+            background: #f0f4f8;
+            padding: 30px 20px;
+            text-align: center;
+            color: #333;
+        }
+        .hero-section h1 {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #4e54c8;
+        }
+
+        /* Form and Table Styling */
+        .form-container, .table-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .form-control {
+            border-radius: 5px;
+        }
+
+        /* Button Styling */
+        .btn-mauve {
+            background-color: #6c63ff;
+            color: white;
+            border: none;
+            transition: background-color 0.3s ease;
+        }
+        .btn-mauve:hover {
+            background-color: #4e54c8;
+        }
+
+        /* Search Input Styling */
+        #searchInput {
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+    <script>
+        function filterResults() {
+            const searchInput = document.getElementById("searchInput").value.toLowerCase();
+            const resultsTable = document.querySelector("table tbody");
+            const resultsRows = resultsTable.getElementsByTagName("tr");
+
+            for (let i = 0; i < resultsRows.length; i++) {
+                const subjectCell = resultsRows[i].getElementsByTagName("td")[1];
+                if (subjectCell) {
+                    const subject = subjectCell.textContent.toLowerCase();
+                    resultsRows[i].style.display = subject.includes(searchInput) ? "" : "none";
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg">
+    <div class="navbar-collapse">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/}">Étudiants</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/exams}">Examens</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/results}">Résultats</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<div class="hero-section">
+    <h1>Gestion des Résultats</h1>
+</div>
+
+<!-- Form Section -->
+<div class="container form-container">
+    <h2>Ajouter un Nouveau Résultat</h2>
+    <form th:action="@{/results}" th:object="${newResult}" method="post">
+        <div class="form-group">
+            <label for="student">Sélectionnez un Étudiant:</label>
+            <label>
+                <select id="student" th:field="*{student.id}" class="form-control" required>
+                    <option th:each="student : ${students}" th:value="${student.id}" th:text="${student.firstName + ' ' + student.lastName}">Étudiant</option>
+                </select>
+            </label>
+        </div>
+
+        <div class="form-group">
+            <label for="exam">Sélectionnez un Examen:</label>
+            <select id="exam" th:field="*{exam.id}" class="form-control" required>
+                <option th:each="exam : ${exams}" th:value="${exam.id}" th:text="${exam.subject + ' - ' + exam.name}">Examen</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="mark">Note:</label>
+            <input id="mark" type="number" th:field="*{mark}" class="form-control" placeholder="Note (0-20)" min="0" max="20" step="0.01" required />
+        </div>
+
+        <button type="submit" class="btn btn-mauve btn-block">Ajouter Résultat</button>
+    </form>
+</div>
+
+<!-- Results Table Section -->
+<div class="container table-container">
+    <h2>Liste des Résultats</h2>
+    <label for="searchInput">Rechercher par Matière:</label>
+    <input type="text" id="searchInput" onkeyup="filterResults()" class="form-control mb-4" placeholder="Entrez le nom de la matière..."/>
+
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th scope="col">Nom de l'Étudiant</th>
+            <th scope="col">Matière</th>
+            <th scope="col">Note</th>
+            <th scope="col">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="result : ${results}">
+            <td th:text="${result.studentFirstName} + ' ' + ${result.studentLastName}">Nom de l'étudiant</td>
+            <td th:text="${result.subject}">Matière</td>
+            <td th:text="${result.mark}">Note</td>
+            <td>
+                <a th:href="@{/results/edit/{id}(id=${result.id})}" class="btn btn-mauve btn-sm">Modifier</a>
+                <form th:action="@{/results/{id}(id=${result.id})}" method="post" th:method="delete" class="d-inline">
+                    <button type="submit" class="btn btn-mauve btn-sm">Supprimer</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>

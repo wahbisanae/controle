@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Examens</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+        /* Navbar Styling */
+        .navbar {
+            background: linear-gradient(90deg, #4e54c8, #8f94fb);
+            color: white;
+        }
+        .nav-link {
+            color: white !important;
+            font-weight: bold;
+        }
+        .nav-link:hover {
+            color: #e0e0e0 !important;
+        }
+
+        /* Hero Section Styling */
+        .hero-section {
+            background: #f0f4f8;
+            padding: 30px 20px;
+            text-align: center;
+            color: #333;
+        }
+        .hero-section h1 {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #4e54c8;
+        }
+
+        /* Form and Table Styling */
+        body {
+            background-color: #f7f7f7;
+        }
+        .form-container, .table-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .form-control {
+            border-radius: 5px;
+        }
+
+        /* Button Styling */
+        .btn-mauve {
+            background-color: #6c63ff;
+            color: white;
+            border: none;
+            transition: background-color 0.3s ease;
+        }
+        .btn-mauve:hover {
+            background-color: #4e54c8;
+        }
+        .btn-primary, .btn-warning, .btn-danger {
+            background-color: #6c63ff;
+            color: white;
+            border: none;
+        }
+        .btn-primary:hover, .btn-warning:hover, .btn-danger:hover {
+            background-color: #4e54c8;
+        }
+
+        /* Search Input Styling */
+        #searchInput {
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg">
+    <!-- Removed the navbar-brand section for "Gestion des Examens" -->
+    <div class="collapse navbar-collapse">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/}">Étudiants</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/exams}">Examens</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/results}">Résultats</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<div class="hero-section">
+    <h1>Gestion des Examens</h1>
+</div>
+
+<!-- Form Section -->
+<div class="container form-container">
+    <h2>Ajouter un Nouvel Examen</h2>
+    <form th:action="@{/exams}" th:object="${newExam}" method="post">
+        <div class="form-group">
+            <input type="text" th:field="*{name}" class="form-control" placeholder="Nom de l'examen" required />
+        </div>
+        <div class="form-group">
+            <input type="date" th:field="*{date}" class="form-control" required />
+        </div>
+        <div class="form-group">
+            <input type="text" th:field="*{subject}" class="form-control" placeholder="Matière" required />
+        </div>
+        <button type="submit" class="btn btn-mauve btn-block">Ajouter Examen</button>
+    </form>
+</div>
+
+<!-- Exam List Section -->
+<div class="container table-container">
+    <h2>Liste des Examens</h2>
+
+    <label for="searchInput">Rechercher par Matière:</label>
+    <input type="text" id="searchInput" onkeyup="filterResults()" class="form-control mb-4" placeholder="Entrez le nom de la matière..."/>
+
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th scope="col">Nom de l'Examen</th>
+            <th scope="col">Date de l'Examen</th>
+            <th scope="col">Matière</th>
+            <th scope="col">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="exam : ${exams}">
+            <td th:text="${exam.name}">Nom de l'examen</td>
+            <td th:text="${exam.date}">Date de l'examen</td>
+            <td th:text="${exam.subject}">Matière</td>
+            <td>
+                <a th:href="@{/exams/edit/{id}(id=${exam.id})}" class="btn btn-mauve btn-sm">Modifier</a>
+                <form th:action="@{/exams/{id}(id=${exam.id})}" method="post" th:method="delete" class="d-inline">
+                    <button type="submit" class="btn btn-mauve btn-sm">Supprimer</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function filterResults() {
+        const searchInput = document.getElementById("searchInput").value.toLowerCase();
+        const resultsTable = document.querySelector("table tbody");
+        const resultsRows = resultsTable.getElementsByTagName("tr");
+
+        for (let i = 0; i < resultsRows.length; i++) {
+            const subjectCell = resultsRows[i].getElementsByTagName("td")[2];
+            if (subjectCell) {
+                const subject = subjectCell.textContent.toLowerCase();
+                resultsRows[i].style.display = subject.includes(searchInput) ? "" : "none";
+            }
+        }
+    }
+</script>
+
+</body>
+</html>
